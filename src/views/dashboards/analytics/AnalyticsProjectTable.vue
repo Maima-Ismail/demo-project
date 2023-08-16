@@ -9,8 +9,6 @@
   const searchQuery = ref('')
   const rowPerPage = 5;
   const currentPage = ref(1)
-  const selectedRows = ref([])
-  const selectAllProject = ref(false)
   const loading = ref(false)
   const editedTitle = ref('')
   const originalTitle= ref('')
@@ -55,32 +53,10 @@
     
     return `Showing ${firstIndex} to ${lastIndex} of ${totalEntries} entries`;
   });
-  const selectUnselectAll = () => {
-  if (selectAllProject.value) {
-    selectedRows.value = currentData.value.map(project => `check${project.id}`);
-  } else {
-    selectedRows.value = [];
-  }
-}
+ 
 
 // Watch for changes in selectedRows and update selectAllProject accordingly
-watch(selectedRows, () => {
-  if (selectedRows.value.length === currentData.value.length) {
-    selectAllProject.value = true;
-  } else {
-    selectAllProject.value = false;
-  }
-}, { deep: true });
-  const addRemoveIndividualCheckbox = checkID => {
-    if (selectedRows.value.includes(checkID)) {
-      const index = selectedRows.value.indexOf(checkID)
 
-      selectedRows.value.splice(index, 1)
-    } else {
-      selectedRows.value.push(checkID)
-      selectAllProject.value = true
-    }
-  }
   const remove = (id) => {
     loading.value = true
     projectStore.deleteRow(id)
@@ -131,7 +107,7 @@ watch(selectedRows, () => {
         <thead>
           <tr>
    
-    <v-btn color="primary" class="mtq-2 mx-2" elevated @click="openModal"> NEW
+    <v-btn color="primary" class="mtq-2 mx-2 mt-2" elevated @click="openModal"> NEW
       <VIcon
         size="18"
         icon="tabler-user-plus"
@@ -142,17 +118,8 @@ watch(selectedRows, () => {
     <modalFormData :isModalOpen="isModalOpen" @close="closeModal" />
           </tr>
           <tr>
-            <!-- 👉 Check/Uncheck all checkbox -->
-             <th scope="col" class="text-center">
-        <div style="width: 1rem;">
-          <VCheckbox
-            :model-value="selectAllProject"
-            @click="selectUnselectAll"
-          />
-        </div>
-      </th>
 
-            <th scope="col" class="font-weight-semibold"></th>
+            <th scope="col" class="font-weight-semibold w-0"></th>
             <th scope="col" class="font-weight-semibold text-center">ALBUM ID</th>
             <th scope="col" class="font-weight-semibold text-center">TITLE</th>
             <th scope="col" class="font-weight-semibold">
@@ -164,20 +131,10 @@ watch(selectedRows, () => {
         <!-- 👉 Table Body -->
         <tbody>
           <tr v-for="project in currentData" :key="project.id" style="height: 3.5rem;">
-            <!-- 👉 Individual checkbox -->
-            <td>
-          <div style="width: 1rem;">
-            <VCheckbox
-              :id="`check${project.id}`"
-              :model-value="selectedRows.includes(`check${project.id}`)"
-              @click="addRemoveIndividualCheckbox(`check${project.id}`)"
-            />
-          </div>
-        </td>
 
             <!-- 👉 Avatar -->
             <td>
-              <div class="d-flex align-center">
+              <div class="d-flex align-center ml-10">
                 <VAvatar variant="tonal" color="primary" size="38">
                   <VImg v-if="project.thumbnailUrl.length" :src="project.thumbnailUrl" />
                   <span v-else class="font-weight-semibold">{{ avatarText(project.title) }}</span>
@@ -193,7 +150,7 @@ watch(selectedRows, () => {
              <div v-if="project.isEditing">
                 <VTextField v-model="editedTitle" @keyup.enter="saveEdit(project)" />
               </div>
-              <div v-else>
+              <div v-else class="text-left">
                 {{ project.title }}
               </div>
             </td>
