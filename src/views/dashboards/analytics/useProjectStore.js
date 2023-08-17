@@ -61,6 +61,10 @@ export const useProjectStore = defineStore('ProjectStore', {
       )
 
       if (foundStudent) {
+         if (title.length < 10) {
+      console.error('New title must be at least 10 characters long');
+      return;
+    }
         // Update the title in the local state
         foundStudent.title = title
 

@@ -1,6 +1,5 @@
   <script setup>
   import { useProjectStore } from '@/views/dashboards/analytics/useProjectStore'
-  import { avatarText } from '@core/utils/formatters'
   import { onMounted } from 'vue'
   import modalFormData from './modalFormData.vue'
 
@@ -12,6 +11,7 @@
   const loading = ref(false)
   const editedTitle = ref('')
   const originalTitle= ref('')
+  const editError = ref({})
 
   onMounted(() => {
     projectStore.fetchData()
@@ -55,26 +55,38 @@
   });
  
 
-// Watch for changes in selectedRows and update selectAllProject accordingly
-
-  const remove = (id) => {
-    loading.value = true
-    projectStore.deleteRow(id)
-    loading.value = false
+  const remove = (project) => {
+  loading.value = true;
+  const index = projectStore.studentData.findIndex(item => item.id === project.id);
+  if (index !== -1) {
+    projectStore.deleteRow(project.id);
+    projectStore.studentData.splice(index, 1);
   }
-  const toggleEdit =(project)=> {
-    project.isEditing = true
-    console.log(project.isEditing)
-    editedTitle.value = project.title
-    originalTitle.value = project.title
-    }
-   const saveEdit = (project) => {
-      projectStore.editTitle({
-        student: project,
-        title: editedTitle.value,
-      })
-      project.isEditing = false
-    }
+  loading.value = false;
+};
+  const toggleEdit = (project) => {
+  project.isEditing = true;
+  editedTitle.value = project.title;
+  originalTitle.value = project.title;
+};
+const clearEditError = (projectId) => {
+  if (editedTitle.value.length >= 10) {
+    editError.value[projectId] = ''; // Clear the error message
+  }
+};
+ const editTitle = (project) => {
+  if (editedTitle.value.length < 10) {
+    editError.value[project.id] = 'Title must be at least 10 characters long';
+    return;
+  }
+  editError.value = {};
+  projectStore.editTitle({
+    student: project,
+    title: editedTitle.value,
+  });
+  project.isEditing = false;
+};
+
     const isModalOpen = ref(false);
     
     const openModal = () => {
@@ -84,6 +96,9 @@
     const closeModal = () => {
      isModalOpen.value = false;
     };
+    const handleRowAdded = (newRow) => {
+  projectStore.studentData.push(newRow);
+};
   </script>
 
   <template>
@@ -115,7 +130,7 @@
         class="mx-2 text-bold"
       />
     </v-btn>
-    <modalFormData :isModalOpen="isModalOpen" @close="closeModal" />
+    <modalFormData :isModalOpen="isModalOpen" @close="closeModal" @rowAdded="handleRowAdded"/>
           </tr>
           <tr>
 
@@ -130,14 +145,13 @@
 
         <!-- 👉 Table Body -->
         <tbody>
-          <tr v-for="project in currentData" :key="project.id" style="height: 3.5rem;">
+          <tr v-for="(project, index) in currentData" :key="index" style="height: 3.5rem;">
 
             <!-- 👉 Avatar -->
             <td>
               <div class="d-flex align-center ml-10">
                 <VAvatar variant="tonal" color="primary" size="38">
-                  <VImg v-if="project.thumbnailUrl.length" :src="project.thumbnailUrl" />
-                  <span v-else class="font-weight-semibold">{{ avatarText(project.title) }}</span>
+                  <VImg :src="project.thumbnailUrl" />
                 </VAvatar>
               </div>
             </td>
@@ -148,7 +162,9 @@
             <!-- 👉 Title -->
             <td>
              <div v-if="project.isEditing">
-                <VTextField v-model="editedTitle" @keyup.enter="saveEdit(project)" />
+                <VTextField v-model="editedTitle"  @input="clearEditError(project.id)"
+    @keyup.enter="editTitle(project)" />
+                 <p v-if="editError[project.id]" class="p">{{ editError[project.id] }}</p>
               </div>
               <div v-else class="text-left">
                 {{ project.title }}
@@ -166,7 +182,7 @@
         class="ma-1"
         color="error"
 
-        @click="remove(project.id)">DELETE</v-btn>
+        @click="remove(project)">DELETE</v-btn>
                   </div>
                   <v-btn :loading="loading"
         class="ma-1"

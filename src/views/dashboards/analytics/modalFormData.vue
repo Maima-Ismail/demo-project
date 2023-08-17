@@ -12,8 +12,10 @@
                       placeholder="Enter Title"
                       v-model="title"
                       class="custom-modal-input"
+                      required
                     />
                 </div>
+                 <p v-if="isTitleInvalid" class=" p">Title must be at least 10 characters long.</p>
               </div>
               <div class="mb-4">
                 <label class="custom-modal-label">Thumbnail:</label>
@@ -23,8 +25,10 @@
                       accept="image/*"
                       @change="handleThumbnailChange"
                       class="custom-modal-input"
+                      required
                     />
                 </div>
+                  <p v-if="isThumbnailValid" class=" p">Image size is too large. Maximum size allowed is 100 KB.</p>
               </div>
               <div class="mb-4">
                 <label class="custom-modal-label">Album-ID:</label>
@@ -33,7 +37,10 @@
                       type="number"
                       placeholder="Enter Album ID"
                       v-model="albumId"
+                      required
                       class="custom-modal-input"
+                      :min="1"
+                      :max="20"
                     />
                 </div>
               </div>
@@ -58,60 +65,68 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { useProjectStore } from '@/views/dashboards/analytics/useProjectStore'
 import { serverTimestamp } from 'firebase/firestore/lite'
+import { ref, defineProps, getCurrentInstance } from 'vue';
 
-export default {
-  name: 'modalFormData',
-  data() {
-    return {
-      title: null,
-      thumbnailUrl: null,
-      albumId: null,
-      selectedThumbnail: null,
+const props = defineProps({
+  isModalOpen: {
+    type: Boolean,
+    required: true,
+  },
+});
+
+const instance = getCurrentInstance(); // Get the current instance
+
+const title = ref(null);
+const selectedThumbnail = ref(null);
+const albumId = ref(null);
+const isTitleInvalid = ref(false);
+const isThumbnailValid = ref(false);
+
+const store = useProjectStore();
+
+const handleThumbnailChange = () => {
+  const file = event.target.files[0]; // Import the 'event' object
+  if (file) {
+    if(file.size > 100*1024){
+      isThumbnailValid.value = true
+      return;
     }
-  },
-  props: {
-    isModalOpen: Boolean,
-  },
-  setup() {
-    const store = useProjectStore()
-    const studentData = useProjectStore().studentData
-    return {
-      store,
-      studentData,
-    }
-  },
-  methods: {
-    handleThumbnailChange() {
-      const file = event.target.files[0]
-      if (file) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.selectedThumbnail = reader.result
-        }
-        reader.readAsDataURL(file)
-      }
-    },
-    handleSubmit() {
-      const newRow = {
-        title: this.title,
-        thumbnailUrl: this.selectedThumbnail,
-        albumId: this.albumId,
-        createdAt: serverTimestamp(),
-      }
-      this.store.addRow(newRow)
-      this.closeModal()
-    },
-    closeModal() {
-      this.$emit('close')
-      this.title = null
-      this.thumbnailUrl = null
-      this.albumId = null
-    },
-  },
-}
+    isThumbnailValid.value = false
+    const reader = new FileReader();
+    reader.onload = () => {
+      selectedThumbnail.value = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+const handleSubmit = () => {
+  if (title.value.length < 10) {
+    isTitleInvalid.value = true;
+    return;
+  }
+  const newRow = {
+    title: title.value,
+    thumbnailUrl: selectedThumbnail.value,
+    albumId: albumId.value,
+    createdAt: serverTimestamp(),
+  };
+  
+  store.addRow(newRow);
+  instance.emit('rowAdded', newRow); // Emit the event using the instance
+  closeModal();
+};
+
+const closeModal = () => {
+  instance.emit('close'); // Emit the 'close' event using the instance
+  title.value = null;
+  selectedThumbnail.value = null;
+  albumId.value = null;
+  isTitleInvalid.value = false;
+};
 </script>
 
 <style>
@@ -202,5 +217,10 @@ body{
 }
 .custom-modal-submit:hover{
     box-shadow: 2px 2.5px 4px rgba(0, 0, 0, 0.3);
+}
+.p{
+  color: red;
+  font-size: x-small;
+  margin-top: 1px;
 }
 </style>
