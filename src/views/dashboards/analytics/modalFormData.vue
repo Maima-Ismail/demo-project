@@ -115,7 +115,7 @@ const handleSubmit = () => {
     createdAt: serverTimestamp(),
   };
   
-  store.addRow(newRow);
+  // store.addRow(newRow);
   instance.emit('rowAdded', newRow); // Emit the event using the instance
   closeModal();
 };

@@ -2,6 +2,8 @@
   import { useProjectStore } from '@/views/dashboards/analytics/useProjectStore'
   import { onMounted } from 'vue'
   import modalFormData from './modalFormData.vue'
+import { doc, deleteDoc, updateDoc, collection, addDoc } from 'firebase/firestore/lite'
+import { dummyFirebase } from '@/firebase/config'
 
   
   const projectStore = useProjectStore()
@@ -55,36 +57,48 @@
   });
  
 
-  const remove = (project) => {
-  loading.value = true;
-  const index = projectStore.studentData.findIndex(item => item.id === project.id);
-  if (index !== -1) {
-    projectStore.deleteRow(project.id);
-    projectStore.studentData.splice(index, 1);
-  }
-  loading.value = false;
-};
   const toggleEdit = (project) => {
-  project.isEditing = true;
+    project.isEditing = true;
   editedTitle.value = project.title;
   originalTitle.value = project.title;
 };
 const clearEditError = (projectId) => {
   if (editedTitle.value.length >= 10) {
-    editError.value[projectId] = ''; // Clear the error message
+    editError.value[projectId] = ''; 
   }
 };
- const editTitle = (project) => {
-  if (editedTitle.value.length < 10) {
-    editError.value[project.id] = 'Title must be at least 10 characters long';
-    return;
+ const editTitle = async (project) => {
+  try {
+    if (editedTitle.value.length < 10) {
+      editError.value[project.id] = 'Title must be at least 10 characters long';
+      return;
+    }
+    const studentDocRef = doc(dummyFirebase, 'Students Data', project.id);
+    await updateDoc(studentDocRef, { title: editedTitle.value });
+
+
+    const foundStudent = projectStore.studentData.find(item => item.id === project.id);
+    if (foundStudent) {
+      foundStudent.title = editedTitle.value;
+      project.isEditing = false;
+    }
+  } catch (error) {
+    console.error('Error updating title:', error);
   }
-  editError.value = {};
-  projectStore.editTitle({
-    student: project,
-    title: editedTitle.value,
-  });
-  project.isEditing = false;
+};
+
+const remove = async (project) => {
+  loading.value = true;
+  try {
+    if (!project.id) {
+      console.error("Cannot delete an unsaved row.");
+      return;
+    }
+    await projectStore.deleteRow(project.id);
+  } catch (error) {
+    console.error('Error deleting row:', error);
+  }
+  loading.value = false;
 };
 
     const isModalOpen = ref(false);
@@ -96,9 +110,19 @@ const clearEditError = (projectId) => {
     const closeModal = () => {
      isModalOpen.value = false;
     };
-    const handleRowAdded = (newRow) => {
-  projectStore.studentData.push(newRow);
+const handleRowAdded = async (newRow) => {
+  try {
+
+    const StudentCollection = collection(dummyFirebase, 'Students Data');
+    const docRef = await addDoc(StudentCollection, newRow);
+
+    newRow.id = docRef.id;
+    projectStore.studentData.push(newRow);
+  } catch (error) {
+    console.error('Error adding row:', error);
+  }
 };
+
   </script>
 
   <template>
