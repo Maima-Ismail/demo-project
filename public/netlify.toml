@@ -5,4 +5,4 @@
 
 [build]
   publish = "dist" # Change this to your Vue.js build output directory
-  command = "vue-cli-service build" # Change this to your build command
+  command = "npm run build" # Change this to your build command
