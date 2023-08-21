@@ -22,6 +22,18 @@ const router = createRouter({
         return { name: 'login', query: to.query }
       },
     },
+    {
+      path:'/pages/authentication/register-v1',
+      name:'pages-authentication-register-v1'
+    },
+    {
+      path:'/pages/authentication/login-v1',
+      name:'pages-authentication-login-v1'
+    },
+    {
+      path: '/pages/authentication/forgot-password-v1',
+      name: 'pages-authentication-forgot-password-v1'
+    },
     ...setupLayouts(routes),
   ],
   scrollBehavior() {
