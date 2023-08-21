@@ -26,7 +26,7 @@ const signupEmail = async () => {
     console.log(user)
     store.setUser(user)
     console.log('signedIn')
-    router.push('/')
+    router.push('/dashboards/analytics')
   } catch (error) {
     console.log(email)
     console.log('Error with Sign Up', error)
