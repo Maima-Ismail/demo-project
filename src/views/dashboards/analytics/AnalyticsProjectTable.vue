@@ -60,7 +60,6 @@ import { dummyFirebase } from '@/firebase/config'
   const toggleEdit = (project) => {
     project.isEditing = true;
   editedTitle.value = project.title;
-  originalTitle.value = project.title;
 };
 const clearEditError = (projectId) => {
   if (editedTitle.value.length >= 10) {
@@ -68,6 +67,7 @@ const clearEditError = (projectId) => {
   }
 };
  const editTitle = async (project) => {
+  loading.value = true;
   try {
     if (editedTitle.value.length < 10) {
       editError.value[project.id] = 'Title must be at least 10 characters long';
@@ -75,7 +75,6 @@ const clearEditError = (projectId) => {
     }
     const studentDocRef = doc(dummyFirebase, 'Students Data', project.id);
     await updateDoc(studentDocRef, { title: editedTitle.value });
-
 
     const foundStudent = projectStore.studentData.find(item => item.id === project.id);
     if (foundStudent) {
@@ -85,6 +84,7 @@ const clearEditError = (projectId) => {
   } catch (error) {
     console.error('Error updating title:', error);
   }
+  loading.value = false;
 };
 
 const remove = async (project) => {
@@ -112,10 +112,8 @@ const remove = async (project) => {
     };
 const handleRowAdded = async (newRow) => {
   try {
-
     const StudentCollection = collection(dummyFirebase, 'Students Data');
     const docRef = await addDoc(StudentCollection, newRow);
-
     newRow.id = docRef.id;
     projectStore.studentData.push(newRow);
   } catch (error) {

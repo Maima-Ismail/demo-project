@@ -3,8 +3,21 @@ import authV1BottomShape from '@/assets/images/svg/auth-v1-bottom-shape.svg'
 import authV1TopShape from '@/assets/images/svg/auth-v1-top-shape.svg'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
+import { getAuth, sendPasswordResetEmail } from 'firebase/auth'
 
-const form = ref({ email: '' })
+const email = ref(null)
+
+const PasswordReset = async () => {
+  try {
+    const auth = getAuth();
+    await sendPasswordResetEmail(auth, email.value);
+    console.log('Password reset email sent successfully');
+    // Optionally, you can show a success message to the user
+  } catch (error) {
+    console.log('Error sending password reset email', error);
+    // Handle the error (e.g., display an error message to the user)
+  }
+};
 </script>
 
 <template>
@@ -49,12 +62,12 @@ const form = ref({ email: '' })
         </VCardText>
 
         <VCardText>
-          <VForm @submit.prevent="() => {}">
+          <VForm @submit.prevent="PasswordReset()">
             <VRow>
               <!-- email -->
               <VCol cols="12">
                 <VTextField
-                  v-model="form.email"
+                  v-model="email"
                   label="Email"
                   type="email"
                 />

@@ -1,17 +1,35 @@
 <script setup>
 import authV1BottomShape from '@/assets/images/svg/auth-v1-bottom-shape.svg'
 import authV1TopShape from '@/assets/images/svg/auth-v1-top-shape.svg'
+import { useProjectStore } from '@/views/dashboards/analytics/useProjectStore'
 import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import router from '@/router'
 
-const form = ref({
-  email: '',
-  password: '',
-  remember: false,
-})
-
-const isPasswordVisible = ref(false)
+  const email = ref(null)
+  const password = ref(null)
+  const remember = ref(false)
+  const isPasswordVisible = ref(false)
+  const loginEmail = async () => {
+      try {
+        const store = useProjectStore()
+        const auth = getAuth()
+        const userCred = await signInWithEmailAndPassword(
+          auth,
+          email.value,
+          password.value
+        )
+        const user = userCred.user
+        store.setUser(user)
+        router.push('/dashboards/analytics')
+        console.log('loggedIn')
+      } catch (error) {
+        console.log('Error with Log in', error)
+      }
+    }
+  
 </script>
 
 <template>
@@ -56,12 +74,12 @@ const isPasswordVisible = ref(false)
         </VCardText>
 
         <VCardText>
-          <VForm @submit.prevent="() => {}">
+          <VForm @submit.prevent="loginEmail()">
             <VRow>
               <!-- email -->
               <VCol cols="12">
                 <VTextField
-                  v-model="form.email"
+                  v-model="email"
                   label="Email"
                   type="email"
                 />
@@ -70,7 +88,7 @@ const isPasswordVisible = ref(false)
               <!-- password -->
               <VCol cols="12">
                 <VTextField
-                  v-model="form.password"
+                  v-model="password"
                   label="Password"
                   :type="isPasswordVisible ? 'text' : 'password'"
                   :append-inner-icon="isPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
@@ -80,7 +98,7 @@ const isPasswordVisible = ref(false)
                 <!-- remember me checkbox -->
                 <div class="d-flex align-center justify-space-between flex-wrap mt-2 mb-4">
                   <VCheckbox
-                    v-model="form.remember"
+                    v-model="remember"
                     label="Remember me"
                   />
 

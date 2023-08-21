@@ -1,18 +1,26 @@
 <script setup>
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
+import router from '@/router'
+import { useProjectStore } from '@/views/dashboards/analytics/useProjectStore'
 const authProviders = [
-  {
-    icon: 'fa-facebook',
-    color: '#4267b2',
-  },
   {
     icon: 'fa-google',
     color: '#dd4b39',
-  },
-  {
-    icon: 'fa-twitter',
-    color: '#1da1f2',
-  },
+  }, 
 ]
+const loginWithGoogle = async () => {
+      const store = useProjectStore()
+      const auth = getAuth()
+      const provider = new GoogleAuthProvider()
+      try {
+        const result = await signInWithPopup(auth, provider)
+        const user = result.user
+        store.setUser(user)
+      } catch (error) {
+        console.log('Error logging in with google', error)
+      }
+      router.push('/dashboards/analytics')
+    }
 </script>
 
 <template>
@@ -25,6 +33,7 @@ const authProviders = [
       size="38"
       :color="link.color"
       class="rounded"
+      @click="loginWithGoogle()"
     >
       <VIcon
         size="18"

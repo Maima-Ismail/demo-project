@@ -14,9 +14,14 @@ import { dummyFirebase } from '../../../firebase/config';
 
 export const useProjectStore = defineStore('ProjectStore', {
   state: () => ({
+    user: null,
     studentData: [],
   }),
   actions: {
+    setUser(user)
+    {
+      this.user= user
+    },
     async fetchData() {
       try {
         const q = query(
@@ -24,7 +29,6 @@ export const useProjectStore = defineStore('ProjectStore', {
           orderBy('albumId', 'asc')
         );
 
-        // Initial fetch using getDocs
         const qs = await getDocs(q);
         this.studentData = qs.docs.map((doc) => ({
           ...doc.data(),
@@ -33,7 +37,6 @@ export const useProjectStore = defineStore('ProjectStore', {
           isEditing: false,
         }));
 
-        // Watch for real-time changes using watchEffect
         watchEffect(async () => {
           const updatedQs = await getDocs(q);
           const updatedStudentData = updatedQs.docs.map((doc) => ({
@@ -43,11 +46,10 @@ export const useProjectStore = defineStore('ProjectStore', {
             isEditing: false,
           }));
 
-          // Update the studentData array with the updated data
           this.studentData = updatedStudentData;
         });
       } catch (error) {
-        console.log('Error in load function', error);
+        console.log('Error in fetching', error);
       }
     },
 
@@ -56,7 +58,6 @@ export const useProjectStore = defineStore('ProjectStore', {
         const studentDocRef = doc(dummyFirebase, 'Students Data', id);
         await deleteDoc(studentDocRef);
 
-        // Update the local state by removing the deleted row
         this.studentData = this.studentData.filter(item => item.id !== id);
       } catch (error) {
         console.error('Error deleting row:', error);
@@ -68,13 +69,11 @@ export const useProjectStore = defineStore('ProjectStore', {
       )
 
       if (foundStudent) {
-        // Update the title in the local state
         foundStudent.title = title
 
-        // Update the title in Firestore
         try {
           const studentDocRef = doc(dummyFirebase, 'Students Data', student.id)
-          await updateDoc(studentDocRef, { title }) // Update the 'title' field in the Firestore document
+          await updateDoc(studentDocRef, { title }) 
         } catch (error) {
           console.error('Error updating title:', error)
         }

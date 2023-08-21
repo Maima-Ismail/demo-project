@@ -1,18 +1,37 @@
 <script setup>
 import authV1BottomShape from '@/assets/images/svg/auth-v1-bottom-shape.svg'
 import authV1TopShape from '@/assets/images/svg/auth-v1-top-shape.svg'
+import { useProjectStore } from '@/views/dashboards/analytics/useProjectStore'
 import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
+import { dummyFirebase } from '@/firebase/config'
+import router from '@/router'
 
-const form = ref({
-  username: '',
-  email: '',
-  password: '',
-  privacyPolicies: false,
-})
-
+const username = ref(null)
+const email = ref(null)
+const password = ref(null)
+const privacyPolicies = ref(false)
 const isPasswordVisible = ref(false)
+
+const signupEmail = async () => {
+  console.log(email.value)
+  try {
+    const store = useProjectStore()
+    const auth = getAuth()
+    const userCred = await createUserWithEmailAndPassword(auth, email.value, password.value)
+    const user = userCred.user
+    console.log(userCred)
+    console.log(user)
+    store.setUser(user)
+    console.log('signedIn')
+    router.push('/dashboards/analytics')
+  } catch (error) {
+    console.log(email)
+    console.log('Error with Sign Up', error)
+  }
+}
 </script>
 
 <template>
@@ -57,19 +76,19 @@ const isPasswordVisible = ref(false)
         </VCardText>
 
         <VCardText>
-          <VForm @submit.prevent="() => {}">
+          <VForm @submit.prevent="signupEmail()">
             <VRow>
               <!-- Username -->
               <VCol cols="12">
                 <VTextField
-                  v-model="form.username"
+                  v-model="username"
                   label="Username"
                 />
               </VCol>
               <!-- email -->
               <VCol cols="12">
                 <VTextField
-                  v-model="form.email"
+                  v-model="email"
                   label="Email"
                   type="email"
                 />
@@ -77,8 +96,8 @@ const isPasswordVisible = ref(false)
 
               <!-- password -->
               <VCol cols="12">
-                <VTextField
-                  v-model="form.password"
+                <VTextField   
+                  v-model="password"
                   label="Password"
                   :type="isPasswordVisible ? 'text' : 'password'"
                   :append-inner-icon="isPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
@@ -88,7 +107,7 @@ const isPasswordVisible = ref(false)
                 <div class="d-flex align-center mt-2 mb-4">
                   <VCheckbox
                     id="privacy-policy"
-                    v-model="form.privacyPolicies"
+                    v-model="privacyPolicies"
                     inline
                   />
                   <VLabel
