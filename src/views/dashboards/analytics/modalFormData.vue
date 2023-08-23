@@ -67,7 +67,6 @@
 
 <script setup>
 import { useProjectStore } from '@/views/dashboards/analytics/useProjectStore'
-import { serverTimestamp } from 'firebase/firestore/lite'
 import { ref, defineProps, getCurrentInstance } from 'vue';
 
 const props = defineProps({
@@ -112,7 +111,6 @@ const handleSubmit = () => {
     title: title.value,
     thumbnailUrl: selectedThumbnail.value,
     albumId: albumId.value,
-    createdAt: serverTimestamp(),
   };
   
   // store.addRow(newRow);
@@ -130,50 +128,52 @@ const closeModal = () => {
 </script>
 
 <style>
-body{
-    font-family:Arial, Helvetica, sans-serif
+body {
+  font-family: Arial, Helvetica, sans-serif;
 }
+
 .custom-modal-background {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+  background-color: rgba(0, 0, 0, 50%);
+  inset: 0;
 }
 
 .custom-modal-content {
-  background-color: #ffffff;
+  padding: 0;
   border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 0rem;
-  width: 34rem;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 10%);
+  inline-size: 34rem;
 }
-.heading{
-    background-color: #faf9f9;
-    border-top-right-radius: 0.5rem;
-    border-top-left-radius: 0.5rem;
-    padding: 1rem;
+
+.heading {
+  padding: 1rem;
+  background-color: #faf9f9;
+  border-start-end-radius: 0.5rem;
+  border-start-start-radius: 0.5rem;
 }
-.form{
-    color: #9c9ca0;
-    padding: 0rem 1rem 1rem 1rem;
+
+.form {
+  color: #9c9ca0;
+  padding-block: 0 1rem;
+  padding-inline: 1rem;
 }
+
 .custom-modal-label {
   font-size: 1rem;
-  margin-bottom: 0.2rem;
+  margin-block-end: 0.2rem;
 }
 
 .custom-modal-input {
-  width: 100%;
   padding: 0.5rem;
   border: 1px solid #dddee0;
-  font-size: small;
   border-radius: 0.375rem;
+  font-size: small;
+  inline-size: 100%;
   outline: none;
   transition: border-color 0.2s ease-in-out;
 }
@@ -185,42 +185,44 @@ body{
 .custom-modal-buttons {
   display: flex;
   justify-content: flex-end;
-  margin-top: 1rem;
+  margin-block-start: 1rem;
 }
 
 .custom-modal-cancel {
-  color:#9c9ca0;
-  padding: 0.1rem 1rem;
-  border-radius: 0.375rem;
-  cursor: pointer;
   border: 1px solid #a1a1a1;
+  border-radius: 0.375rem;
   background-color: transparent;
+  color: #9c9ca0;
+  cursor: pointer;
+  margin-inline-end: 1rem;
   outline: none;
-  margin-right: 1rem;
+  padding-block: 0.1rem;
+  padding-inline: 1rem;
   transition: background-color 0.3s, color 0.3s;
 }
 
 .custom-modal-cancel:hover {
   background-color: #ececec;
-  
 }
-
 
 .custom-modal-submit {
-  background-color: #3d885a;
-  color: #ffffff;
-  padding: 0.3rem 1rem;
+  border: none;
   border-radius: 0.375rem;
+  background-color: #3d885a;
+  color: #fff;
   cursor: pointer;
   outline: none;
-  border: none;
+  padding-block: 0.3rem;
+  padding-inline: 1rem;
 }
-.custom-modal-submit:hover{
-    box-shadow: 2px 2.5px 4px rgba(0, 0, 0, 0.3);
+
+.custom-modal-submit:hover {
+  box-shadow: 2px 2.5px 4px rgba(0, 0, 0, 30%);
 }
-.p{
+
+.p {
   color: red;
   font-size: x-small;
-  margin-top: 1px;
+  margin-block-start: 1px;
 }
 </style>

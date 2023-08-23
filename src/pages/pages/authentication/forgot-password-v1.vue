@@ -9,15 +9,18 @@ const email = ref(null)
 
 const PasswordReset = async () => {
   try {
-    const auth = getAuth();
-    await sendPasswordResetEmail(auth, email.value);
-    console.log('Password reset email sent successfully');
+    const auth = getAuth()
+
+    await sendPasswordResetEmail(auth, email.value)
+    console.log('Password reset email sent successfully')
+
     // Optionally, you can show a success message to the user
   } catch (error) {
-    console.log('Error sending password reset email', error);
+    console.log('Error sending password reset email', error)
+
     // Handle the error (e.g., display an error message to the user)
   }
-};
+}
 </script>
 
 <template>
@@ -62,7 +65,7 @@ const PasswordReset = async () => {
         </VCardText>
 
         <VCardText>
-          <VForm @submit.prevent="PasswordReset()">
+          <VForm @submit.prevent="PasswordReset">
             <VRow>
               <!-- email -->
               <VCol cols="12">
