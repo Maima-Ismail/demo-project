@@ -4,7 +4,6 @@ import authV1TopShape from '@/assets/images/svg/auth-v1-top-shape.svg'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 import { getAuth, sendPasswordResetEmail } from 'firebase/auth'
-
 const email = ref(null)
 
 const PasswordReset = async () => {

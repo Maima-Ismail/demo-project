@@ -1,13 +1,11 @@
 <script setup>
 import authV1BottomShape from '@/assets/images/svg/auth-v1-bottom-shape.svg'
 import authV1TopShape from '@/assets/images/svg/auth-v1-top-shape.svg'
-import { useProjectStore } from '@/views/dashboards/analytics/useProjectStore'
-import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
-import { dummyFirebase } from '@/firebase/config'
+import AuthProvider from '/src/views/pages/authentication/AuthProvider.vue'
 import router from '@/router'
+import axios from 'axios'
 
 const username = ref(null)
 const email = ref(null)
@@ -16,19 +14,13 @@ const privacyPolicies = ref(false)
 const isPasswordVisible = ref(false)
 
 const signupEmail = async () => {
-  console.log(email.value)
   try {
-    const store = useProjectStore()
-    const auth = getAuth()
-    const userCred = await createUserWithEmailAndPassword(auth, email.value, password.value)
-    const user = userCred.user
-    console.log(userCred)
-    console.log(user)
-    store.setUser(user)
-    console.log('signedIn')
+    const response  =  await axios.post('http://localhost:3003/signup', {
+      userName : username.value,
+      userEmail: email.value,
+      userPassword: password.value})
     router.push('/dashboards/analytics')
   } catch (error) {
-    console.log(email)
     console.log('Error with Sign Up', error)
   }
 }

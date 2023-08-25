@@ -1,12 +1,11 @@
 <script setup>
 import authV1BottomShape from '@/assets/images/svg/auth-v1-bottom-shape.svg'
 import authV1TopShape from '@/assets/images/svg/auth-v1-top-shape.svg'
-import { useProjectStore } from '@/views/dashboards/analytics/useProjectStore'
-import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import AuthProvider from '/src/views/pages/authentication/AuthProvider.vue'
 import router from '@/router'
+import axios from 'axios'
 
   const email = ref(null)
   const password = ref(null)
@@ -14,17 +13,11 @@ import router from '@/router'
   const isPasswordVisible = ref(false)
   const loginEmail = async () => {
       try {
-        const store = useProjectStore()
-        const auth = getAuth()
-        const userCred = await signInWithEmailAndPassword(
-          auth,
-          email.value,
-          password.value
-        )
-        const user = userCred.user
-        store.setUser(user)
+          await axios.post('http://localhost:3003/login',{
+          userEmail: email.value,
+          userPassword: password.value,
+        })
         router.push('/dashboards/analytics')
-        console.log('loggedIn')
       } catch (error) {
         console.log('Error with Log in', error)
       }
@@ -97,7 +90,7 @@ import router from '@/router'
 
                 <!-- remember me checkbox -->
                 <div class="d-flex align-center justify-space-between flex-wrap mt-2 mb-4">
-                  <VCheckbox
+                  <!-- <VCheckbox
                     v-model="remember"
                     label="Remember me"
                   />
@@ -107,7 +100,7 @@ import router from '@/router'
                     :to="{ name: 'pages-authentication-forgot-password-v1' }"
                   >
                     Forgot Password?
-                  </RouterLink>
+                  </RouterLink> -->
                 </div>
 
                 <!-- login button -->
