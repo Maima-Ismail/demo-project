@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vuexy - Vuejs Admin Dashboard Template</title>
+    <link rel="stylesheet" type="text/css" href="/loader.css" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Material+Icons"
+      rel="stylesheet"
+    />
+
+    <script>
+      window.fbAsyncInit = function () {
+        FB.init({
+          appId: "817957303155886",
+          cookie: true,
+          xfbml: true,
+          version: "v12.0",
+        });
+
+        FB.AppEvents.logPageView();
+      };
+
+      (function (d, s, id) {
+        var js,
+          fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {
+          return;
+        }
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+      })(document, "script", "facebook-jssdk");
+    </script>
+    <script type="module" crossorigin src="/assets/index.ef6063b0.js"></script>
+    <link rel="stylesheet" href="/assets/index.38aa3b15.css">
+  </head>
+
+  <body>
+    <div id="app">
+      <fb:login-button
+        scope="public_profile,email"
+        onlogin="checkLoginState();"
+      >
+      </fb:login-button>
+      <div id="loading-bg">
+        <div class="loading-logo">
+          <img src="/logo.png" alt="Logo" />
+        </div>
+        <div class="loading">
+          <div class="effect-1 effects"></div>
+          <div class="effect-2 effects"></div>
+          <div class="effect-3 effects"></div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      const loaderColor =
+        localStorage.getItem("Materio-initial-loader-bg") || "#FFFFFF";
+      const primaryColor =
+        localStorage.getItem("Materio-initial-loader-color") || "#7367F0";
+
+      if (loaderColor)
+        document.documentElement.style.setProperty(
+          "--initial-loader-bg",
+          loaderColor
+        );
+      if (primaryColor)
+        document.documentElement.style.setProperty(
+          "--initial-loader-color",
+          primaryColor
+        );
+    </script>
+  </body>
+</html>
